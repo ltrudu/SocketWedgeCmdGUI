@@ -19,6 +19,7 @@ namespace SocketWedgeCmdGUI
     {
         private String mCmdContent = "";
         private SocketWedgeConfig mConfig = new SocketWedgeConfig();
+        Boolean socketWedgeExeFound = false;
         Boolean updatingGUI = false;
         private String exeDirectory = "";
 
@@ -48,7 +49,8 @@ namespace SocketWedgeCmdGUI
             updatePreview();
             exeDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string exeFullPath = Path.Combine(exeDirectory, "SocketWedge.exe");
-            if(File.Exists(exeFullPath) && checkConfig(false) == true)
+            socketWedgeExeFound = File.Exists(exeFullPath);
+            if (socketWedgeExeFound && checkConfig(false) == true)
             {
                 btTest.Visible = true;
             }
@@ -179,7 +181,7 @@ namespace SocketWedgeCmdGUI
                     MessageBox.Show("Missing Command Window Title", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 txtPreview.Text = "Missing Command Window Title";
                 btTest.Visible = false;
-                 return false;
+                return false;
             }
             
             if (mConfig.mWindowName.Length == 0)
@@ -201,7 +203,8 @@ namespace SocketWedgeCmdGUI
                 return false;
             }
 
-            btTest.Visible = true;
+            if(socketWedgeExeFound == true)
+                btTest.Visible = true;
             return true;
         }
 
