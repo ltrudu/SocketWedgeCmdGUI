@@ -23,7 +23,15 @@ namespace SocketWedgeCmdGUI
         public String getCMDFileString()
         {
             String cmdFileString = "";
-            cmdFileString += "title " + mCommandWindowTitle + "\n";
+            if(mCommandWindowTitle != null)
+            {
+                cmdFileString += "title " + mCommandWindowTitle + "\r\n";
+            }
+            else
+            {
+                cmdFileString += "title SocketWedge\r\n";
+            }
+             
             cmdFileString += "call SocketWedge ";
             foreach(KeyValuePair<String, String> server in mServerList)
             {
@@ -31,7 +39,7 @@ namespace SocketWedgeCmdGUI
             }
             cmdFileString += "/AddReturn=" + (mAddReturn ? "1" : "0") + " ";
             cmdFileString += "/Wedge=" + (mWedge ? "1" : "0") + " ";
-            cmdFileString += "/FocusWindow=" + mWindowName + "\n";
+            cmdFileString += "/FocusWindow=" + mWindowName + "\r\n";
 
             return cmdFileString;
         }

@@ -43,6 +43,9 @@
             this.Port = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btDelete = new System.Windows.Forms.Button();
             this.btAdd = new System.Windows.Forms.Button();
+            this.txtPreview = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.btTest = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,7 +55,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(402, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(832, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -93,7 +96,8 @@
             this.txtWindowName.Location = new System.Drawing.Point(94, 48);
             this.txtWindowName.Name = "txtWindowName";
             this.txtWindowName.Size = new System.Drawing.Size(291, 20);
-            this.txtWindowName.TabIndex = 2;
+            this.txtWindowName.TabIndex = 1;
+            this.txtWindowName.TextChanged += new System.EventHandler(this.on_ValueChanged);
             // 
             // cbAddReturn
             // 
@@ -104,13 +108,15 @@
             this.cbAddReturn.TabIndex = 4;
             this.cbAddReturn.Text = "Add Return";
             this.cbAddReturn.UseVisualStyleBackColor = true;
+            this.cbAddReturn.CheckedChanged += new System.EventHandler(this.on_ValueChanged);
             // 
             // txtCmdTitle
             // 
             this.txtCmdTitle.Location = new System.Drawing.Point(94, 20);
             this.txtCmdTitle.Name = "txtCmdTitle";
             this.txtCmdTitle.Size = new System.Drawing.Size(291, 20);
-            this.txtCmdTitle.TabIndex = 6;
+            this.txtCmdTitle.TabIndex = 0;
+            this.txtCmdTitle.TextChanged += new System.EventHandler(this.on_ValueChanged);
             // 
             // label2
             // 
@@ -130,6 +136,7 @@
             this.cbWedge.TabIndex = 7;
             this.cbWedge.Text = "Wedge";
             this.cbWedge.UseVisualStyleBackColor = true;
+            this.cbWedge.CheckedChanged += new System.EventHandler(this.on_ValueChanged);
             // 
             // lvServers
             // 
@@ -140,7 +147,7 @@
             this.lvServers.Location = new System.Drawing.Point(16, 105);
             this.lvServers.Name = "lvServers";
             this.lvServers.Size = new System.Drawing.Size(374, 192);
-            this.lvServers.TabIndex = 8;
+            this.lvServers.TabIndex = 2;
             this.lvServers.UseCompatibleStateImageBehavior = false;
             // 
             // Ip
@@ -158,7 +165,7 @@
             this.btDelete.Location = new System.Drawing.Point(137, 303);
             this.btDelete.Name = "btDelete";
             this.btDelete.Size = new System.Drawing.Size(109, 23);
-            this.btDelete.TabIndex = 9;
+            this.btDelete.TabIndex = 4;
             this.btDelete.Text = "Delete Server";
             this.btDelete.UseVisualStyleBackColor = true;
             this.btDelete.Click += new System.EventHandler(this.btDelete_Click);
@@ -168,16 +175,46 @@
             this.btAdd.Location = new System.Drawing.Point(16, 303);
             this.btAdd.Name = "btAdd";
             this.btAdd.Size = new System.Drawing.Size(115, 23);
-            this.btAdd.TabIndex = 10;
+            this.btAdd.TabIndex = 3;
             this.btAdd.Text = "Add Server";
             this.btAdd.UseVisualStyleBackColor = true;
             this.btAdd.Click += new System.EventHandler(this.btAdd_Click);
+            // 
+            // txtPreview
+            // 
+            this.txtPreview.Location = new System.Drawing.Point(397, 105);
+            this.txtPreview.Multiline = true;
+            this.txtPreview.Name = "txtPreview";
+            this.txtPreview.Size = new System.Drawing.Size(423, 192);
+            this.txtPreview.TabIndex = 11;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(397, 81);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(45, 13);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "Preview";
+            // 
+            // btTest
+            // 
+            this.btTest.Location = new System.Drawing.Point(400, 303);
+            this.btTest.Name = "btTest";
+            this.btTest.Size = new System.Drawing.Size(75, 23);
+            this.btTest.TabIndex = 13;
+            this.btTest.Text = "Test";
+            this.btTest.UseVisualStyleBackColor = true;
+            this.btTest.Click += new System.EventHandler(this.btTest_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(402, 334);
+            this.ClientSize = new System.Drawing.Size(832, 334);
+            this.Controls.Add(this.btTest);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtPreview);
             this.Controls.Add(this.btAdd);
             this.Controls.Add(this.btDelete);
             this.Controls.Add(this.lvServers);
@@ -191,6 +228,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Socket Wedge CMD Creator";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -215,6 +253,9 @@
         private System.Windows.Forms.ColumnHeader Port;
         private System.Windows.Forms.Button btDelete;
         private System.Windows.Forms.Button btAdd;
+        private System.Windows.Forms.TextBox txtPreview;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button btTest;
     }
 }
 

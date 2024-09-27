@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,7 +18,9 @@ namespace SocketWedgeCmdGUI
     public partial class Form1 : Form
     {
         private String mCmdContent = "";
-        private SocketWedgeConfig mConfig;
+        private SocketWedgeConfig mConfig = new SocketWedgeConfig();
+        Boolean updatingGUI = false;
+        private String exeDirectory = "";
 
         private System.Windows.Forms.TextBox editBox1;
         private System.Windows.Forms.TextBox editBox2;
@@ -39,6 +43,21 @@ namespace SocketWedgeCmdGUI
             Controls.Add(editBox1);
             Controls.Add(editBox2);
         }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            updatePreview();
+            exeDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string exeFullPath = Path.Combine(exeDirectory, "SocketWedge.exe");
+            if(File.Exists(exeFullPath) && checkConfig(false) == true)
+            {
+                btTest.Visible = true;
+            }
+            else
+            {
+                btTest.Visible = false;
+            }
+        }
+
 
         private void LvServers_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -73,6 +92,7 @@ namespace SocketWedgeCmdGUI
                 item.SubItems[0].Text = editBox1.Text;
             }
             editBox1.Visible = false;
+            updatePreview();
         }
 
         private void EditBox2_Leave(object sender, EventArgs e)
@@ -83,6 +103,7 @@ namespace SocketWedgeCmdGUI
                 item.SubItems[1].Text = editBox2.Text;
             }
             editBox2.Visible = false;
+            updatePreview();
         }
 
         private void EditBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -91,6 +112,7 @@ namespace SocketWedgeCmdGUI
             {
                 ((System.Windows.Forms.TextBox)sender).Visible = false;
             }
+            updatePreview();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs eventArgs)
@@ -128,6 +150,9 @@ namespace SocketWedgeCmdGUI
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs eventArgs)
         {
+            if (checkConfig(true) == false)
+                return;
+
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "Command Files (*.cmd)|*.cmd",
@@ -146,15 +171,46 @@ namespace SocketWedgeCmdGUI
             }
         }
 
+        private Boolean checkConfig(Boolean displayMessageBox)
+        {
+            if (mConfig.mCommandWindowTitle.Length == 0)
+            {
+                if (displayMessageBox)
+                    MessageBox.Show("Missing Command Window Title", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtPreview.Text = "Missing Command Window Title";
+                btTest.Visible = false;
+                 return false;
+            }
+            
+            if (mConfig.mWindowName.Length == 0)
+            {
+                if(displayMessageBox)
+                    MessageBox.Show("Missing Target Window Name", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtPreview.Text = "Missing Target Window Name";
+                btTest.Visible = false;
+                return false;
+            }
+
+
+            if (mConfig.mServerList.Count == 0)
+            {
+                if (displayMessageBox)
+                    MessageBox.Show("Missing Server", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtPreview.Text = "Missing Server";
+                btTest.Visible = false;
+                return false;
+            }
+
+            btTest.Visible = true;
+            return true;
+        }
+
         private void updateConfigFromGUI()
         {
             mConfig = new SocketWedgeConfig();
             mConfig.mCommandWindowTitle = txtCmdTitle.Text;
-            if (mConfig.mCommandWindowTitle.Length == 0)
-                mConfig.mCommandWindowTitle = "SocketWedge Test";
-
+ 
             mConfig.mWindowName = txtWindowName.Text;
-            if (mConfig.mWindowName.Length == 0) mConfig.mWindowName = "Notepad";
 
             mConfig.mWedge = cbWedge.Checked;
             mConfig.mAddReturn = cbAddReturn.Checked;
@@ -164,8 +220,15 @@ namespace SocketWedgeCmdGUI
                 string value = item.SubItems[1].Text;
                 mConfig.mServerList[key] = value;
             }
-            if (mConfig.mServerList.Count == 0)
-                mConfig.mServerList["192.168.1.1"] = "25250";
+        }
+
+        private void updatePreview()
+        {
+            updateConfigFromGUI();
+            if(checkConfig(false))
+            {
+                txtPreview.Text = mConfig.getCMDFileString();
+            }
         }
 
 
@@ -207,6 +270,7 @@ namespace SocketWedgeCmdGUI
 
         private void updateGUI()
         {
+            updatingGUI = true;
             txtCmdTitle.Text = mConfig.mCommandWindowTitle;
             txtWindowName.Text = mConfig.mWindowName;
             cbAddReturn.Checked = mConfig.mAddReturn;
@@ -218,6 +282,8 @@ namespace SocketWedgeCmdGUI
                 item.SubItems.Add(servers.Value);
                 lvServers.Items.Add(item);
             }
+            updatePreview();
+            updatingGUI = false;
         }
 
         private void btDelete_Click(object sender, EventArgs e)
@@ -225,6 +291,7 @@ namespace SocketWedgeCmdGUI
             if (lvServers.SelectedItems.Count > 0)
             {
                 lvServers.Items.Remove(lvServers.SelectedItems[0]);
+                updatePreview();
             }
             else
             {
@@ -237,7 +304,35 @@ namespace SocketWedgeCmdGUI
             ListViewItem item = new ListViewItem("IP");
             item.SubItems.Add("PORT");
             lvServers.Items.Add(item);
+            updatePreview();
+        }
 
+        private void on_ValueChanged(object sender, EventArgs e)
+        {
+            if(updatingGUI == false)
+                updatePreview();
+        }
+
+        private void btTest_Click(object sender, EventArgs e)
+        {
+            updateConfigFromGUI();
+
+            String configAsString = mConfig.getCMDFileString();
+            String filePath = Path.Combine(exeDirectory, "test.cmd");
+            System.IO.File.WriteAllText(filePath, configAsString);
+
+            // Create a new process
+            Process process = new Process();
+            process.StartInfo.FileName = filePath;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.RedirectStandardError = false;
+
+            // Start the process
+            process.Start();
+
+            // Wait for the process to exit
+            process.WaitForExit();
         }
     }
 }
