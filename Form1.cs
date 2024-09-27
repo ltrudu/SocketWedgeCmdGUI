@@ -336,6 +336,8 @@ namespace SocketWedgeCmdGUI
 
             // Wait for the process to exit
             process.WaitForExit();
+
+            File.Delete(filePath);
         }
     }
 }
